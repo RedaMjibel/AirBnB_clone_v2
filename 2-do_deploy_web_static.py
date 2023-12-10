@@ -1,13 +1,13 @@
 #!/usr/bin/python3
 """
-Fabric script to distribute an archive to servers based on the already created file
+Fabric script to distribute an archive to servers
 """
 
 from fabric.api import put, run, env
 from os.path import exists
 import os 
 
-env.hosts = ['35.153.18.223', '18.234.192.79']
+env.hosts = ['100.26.163.17', '54.237.61.242']
 
 def do_deploy(archive_path):
     """
