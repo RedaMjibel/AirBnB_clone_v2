@@ -5,7 +5,7 @@ Fabric script to distribute an archive to servers based on the already created f
 
 from fabric.api import put, run, env
 from os.path import exists
-import os  # Add this line to import the 'os' module
+import os 
 
 env.hosts = ['35.153.18.223', '18.234.192.79']
 
@@ -20,7 +20,6 @@ def do_deploy(archive_path):
         True if all is okay, else False.
     """
     if exists(archive_path) is False:
-        # Check if the archive_path exists
         print(f"Archive not found: {archive_path}")
         return False
 
@@ -39,7 +38,7 @@ def do_deploy(archive_path):
         run("ln -s {} /data/web_static/current".format(folder_path))
         print('New version deployed!')
         success = True
-    except Exception as e:  # Fix typo "Exeption" to "Exception"
+    except Exception as e:
         print(f"Deployment failed: {e}")
         success = False
     return success
