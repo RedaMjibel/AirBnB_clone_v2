@@ -1,46 +1,47 @@
 #!/usr/bin/python3
+"""Compress web static package
 """
-Fabric script to distribute an archive to servers
-"""
-
-from fabric.api import put, run, env
-from os.path import exists
-import os 
+from fabric.api import *
+from datetime import datetime
+from os import path
 
 
 env.hosts = ['100.26.163.17', '54.237.61.242']
+env.user = 'ubuntu'
+env.key_filename = '~/.ssh/id_rsa'
 
 
 def do_deploy(archive_path):
-    """
-    Deploy the archive of static files to the webservers.
+        """Deploy web files to server
+        """
+        try:
+                if not (path.exists(archive_path)):
+                        return False
 
-    Arguments:
-        archive_path: The path to the archive to distribute.
+                put(archive_path, '/tmp/')
 
-    Returns:
-        True if all is okay, else False.
-    """
-    if exists(archive_path) is False:
-        print(f"Archive not found: {archive_path}")
-        return False
+                timestamp = archive_path[-18:-4]
+                run('sudo mkdir -p /data/web_static/\
+releases/web_static_{}/'.format(timestamp))
 
-    file_name = os.path.basename(archive_path)
-    folder_name = file_name.replace(".tgz", "")
-    folder_path = "/data/web_static/releases/{}".format(folder_name)
-    success = False
-    try:
-        put(archive_path, "/tmp/{}".format(file_name))
-        run("mkdir -p {}".format(folder_path))
-        run("tar -xzf /tmp/{} -C {}".format(file_name, folder_path))
-        run("rm -rf /tmp/{}".format(file_name))
-        run("mv {}/web_static/* {}".format(folder_path, folder_path))
-        run("rm -rf {}/web_static".format(folder_path))
-        run("rm -rf /data/web_static/current")
-        run("ln -s {} /data/web_static/current".format(folder_path))
-        print('New version deployed!')
-        success = True
-    except Exception as e:
-        print(f"Deployment failed: {e}")
-        success = False
-    return success
+                run('sudo tar -xzf /tmp/web_static_{}.tgz -C \
+/data/web_static/releases/web_static_{}/'
+                    .format(timestamp, timestamp))
+
+                run('sudo rm /tmp/web_static_{}.tgz'.format(timestamp))
+
+                run('sudo mv /data/web_static/releases/web_static_{}/web_static/* \
+/data/web_static/releases/web_static_{}/'.format(timestamp, timestamp))
+
+                run('sudo rm -rf /data/web_static/releases/\
+web_static_{}/web_static'
+                    .format(timestamp))
+
+                run('sudo rm -rf /data/web_static/current')
+
+                run('sudo ln -s /data/web_static/releases/\
+web_static_{}/ /data/web_static/current'.format(timestamp))
+        except:
+                return False
+
+        return True
