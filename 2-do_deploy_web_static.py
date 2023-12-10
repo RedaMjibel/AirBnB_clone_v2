@@ -10,7 +10,7 @@ import os
 
 env.hosts = ['100.26.163.17', '54.237.61.242']
 
-@task
+
 def do_deploy(archive_path):
     """
     Deploy the archive of static files to the webservers.
