@@ -1,53 +1,69 @@
 #!/usr/bin/python3
 """
-creates and ditributes an archive to the the servers, using deploy
+this script creates and ditributes an archive to the the server, using deploy
 """
-
-from fabric.api import env, local, put, run
+import os
 from datetime import datetime
-from os.path import exists, isdir
+from fabric.api import env, local, put, run, runs_once
+
+
 env.hosts = ['100.26.163.17', '54.237.61.242']
 env.user = 'ubuntu'
 env.key_filename = '~/.ssh/id_rsa'
 
 
+@runs_once
 def do_pack():
-    """Creates a tgz archive using fabric"""
+    """make a tgz archive from static files."""
+    if not os.path.isdir("versions"):
+        os.mkdir("versions")
+    cur_time = datetime.now()
+    output = "versions/web_static_{}{}{}{}{}{}.tgz".format(
+        cur_time.year,
+        cur_time.month,
+        cur_time.day,
+        cur_time.hour,
+        cur_time.minute,
+        cur_time.second
+    )
     try:
-        date = datetime.now().strftime("%Y%m%d%H%M%S")
-        if isdir("versions") is False:
-            local("mkdir versions")
-        filename = "versions/web_static_{}.tgz".format(date)
-        local("tar -cvzf {} web_static".format(filename))
-        return filename
-    except Exception as ex:
-        return None
+        print("Packing web_static to {}".format(output))
+        local("tar -cvzf {} web_static".format(output))
+        archize_size = os.stat(output).st_size
+        print("web_static packed: {} -> {} Bytes".format(output, archize_size))
+    except Exception:
+        output = None
+    return output
 
 
 def do_deploy(archive_path):
-    """deploy web static with fabric"""
-    if exists(archive_path) is False:
+    """Deploys thz archive to the host servers.
+    """
+    if not os.path.exists(archive_path):
         return False
-
+    file_n = os.path.basename(archive_path)
+    folder_n = file_n.replace(".tgz", "")
+    folder_path = "/data/web_static/releases/{}/".format(folder_n)
+    success = False
     try:
-        filename = archive_path.split("/")[-1]
-        no_excep = filename.split(".")[0]
-        path = "/data/web_static/releases/"
-        put(archive_path, '/tmp/')
-        run('sudo mkdir -p {}{}/'.format(path, no_excep))
-        run('sudo tar -xzf /tmp/{} -C {}{}/'.format(filename, path, no_excep))
-        run('sudo rm /tmp/{}'.format(filename))
-        run('sudo mv {0}{1}/web_static/* {0}{1}/'.format(path, no_excep))
-        run('sudo rm -rf {}{}/web_static'.format(path, no_excep))
-        run('sudo rm -rf /data/web_static/current')
-        run('sudo ln -s {}{}/ /data/web_static/current'.format(path, no_excep))
-        return True
-    except BaseException:
-        return False
+        put(archive_path, "/tmp/{}".format(file_n))
+        run("mkdir -p {}".format(folder_path))
+        run("tar -xzf /tmp/{} -C {}".format(file_n, folder_path))
+        run("rm -rf /tmp/{}".format(file_n))
+        run("mv {}web_static/* {}".format(folder_path, folder_path))
+        run("rm -rf {}web_static".format(folder_path))
+        run("rm -rf /data/web_static/current")
+        run("ln -s {} /data/web_static/current".format(folder_path))
+        print('New version is now LIVE!')
+        success = True
+    except Exception:
+        success = False
+    return success
 
 
 def deploy():
-    """ do path an do deploy"""
+    """Creates and dploy an archive to the host servers.
+    """
     archive_path = do_pack()
     if archive_path is None:
         return False
