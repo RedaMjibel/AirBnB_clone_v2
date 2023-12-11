@@ -1,18 +1,18 @@
 #!/usr/bin/python3
 """
-this script creates and ditributes an archive to the the server, using deploy
+creates and ditributes an archive to the the servers, using deploy
 """
 import os
 from datetime import datetime
 from fabric.api import env, local, put, run, runs_once
 
 
-env.hosts = ['35.153.18.223', '18.234.192.79']
+env.hosts = ['100.26.163.17', '54.237.61.242']
 
 
 @runs_once
 def do_pack():
-    """make a tgz archive from static files."""
+    """creates a .tgz archive from static files."""
     if not os.path.isdir("versions"):
         os.mkdir("versions")
     cur_time = datetime.now()
@@ -35,7 +35,7 @@ def do_pack():
 
 
 def do_deploy(archive_path):
-    """Deploys thz archive to the host servers.
+    """Deploys the archive to the host servers.
     """
     if not os.path.exists(archive_path):
         return False
@@ -52,7 +52,7 @@ def do_deploy(archive_path):
         run("rm -rf {}web_static".format(folder_path))
         run("rm -rf /data/web_static/current")
         run("ln -s {} /data/web_static/current".format(folder_path))
-        print('New version is now LIVE!')
+        print('New version deployed!')
         success = True
     except Exception:
         success = False
