@@ -8,6 +8,8 @@ from fabric.api import env, local, put, run, runs_once
 
 
 env.hosts = ['100.26.163.17', '54.237.61.242']
+env.user = 'ubuntu'
+env.key_filename = '~/.ssh/id_rsa'
 
 
 @runs_once
@@ -63,4 +65,6 @@ def deploy():
     """Creates and dploy an archive to the host servers.
     """
     archive_path = do_pack()
-    return do_deploy(archive_path) if archive_path else False
+    if archive_path is None:
+        return False
+    return do_deploy(archive_path)
