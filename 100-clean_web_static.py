@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-With Facric , creates a tgz archive
+With Fabric , create a tgz archive
 from web_static content folder
 """
 
