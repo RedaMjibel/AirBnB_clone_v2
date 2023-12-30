@@ -12,9 +12,14 @@ def hello():
     return "Hello HBNB!"
 
 
-@app.route("/hbnb")
+@app.route("/hbnb", strict_slashes=False)
 def hbnb():
     return "HBNB"
+
+
+@app.route("/c/<text>", strict_slashes=False)
+def c_isfun(text):
+    return 'C ' + text.replace('_', ' ')
 
 
 if __name__ == '__main__':
