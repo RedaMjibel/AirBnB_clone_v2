@@ -2,8 +2,6 @@
 """This module instantiates an object of class FileStorage or DBStorage"""
 
 from os import getenv
-from models.base_model import BaseModel
-from models.user import User
 
 storage_type = getenv('HBNB_TYPE_STORAGE')
 
