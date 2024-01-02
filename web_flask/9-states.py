@@ -29,7 +29,7 @@ def states_1(id=None):
 
 @app.teardown_appcontext
 def teardown(self):
-    """Removes the current SQLAlchemy Session"""
+    """Removes the current SQL Alchemy Session"""
     storage.close()
 
 if __name__ == '__main__':
