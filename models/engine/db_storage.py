@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 """This module defines the engine for the MySQL database"""
 
-from models.base_model import BaseModel
 from models.base_model import Base
 from models.user import User
 from models.state import State
@@ -67,6 +66,7 @@ class DBStorage:
                     key = '{}.{}'.format(name, obj.id)
                     result[key] = obj
             return result
+
     def new(self, obj):
         """Method to add a new object to the current database"""
         DBStorage.__session.add(obj)
@@ -90,6 +90,7 @@ class DBStorage:
     def close(self):
         """Public method to call the remove method"""
         DBStorage.__session.close()
+
 
 # Creating an instance of DBStorage and storing it in the variable storage
 storage = DBStorage()
