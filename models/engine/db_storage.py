@@ -19,6 +19,7 @@ host = os.getenv('HBNB_MYSQL_HOST')
 db = os.getenv('HBNB_MYSQL_DB')
 env = os.getenv('HBNB_ENV')
 
+
 class DBStorage:
     """Defining the class DBStorage"""
 
@@ -66,7 +67,6 @@ class DBStorage:
                     key = '{}.{}'.format(name, obj.id)
                     result[key] = obj
             return result
-    
     def new(self, obj):
         """Method to add a new object to the current database"""
         DBStorage.__session.add(obj)

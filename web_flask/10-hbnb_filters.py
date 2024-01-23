@@ -8,7 +8,7 @@ from flask import render_template
 app = Flask(__name__)
 
 
-@app.route('/states', strict_slashes=False)
+@app.route('/hbnb_filters', strict_slashes=False)
 def hbnb_filters():
     """
     returns a rendered html template
@@ -17,8 +17,7 @@ def hbnb_filters():
     states = storage.all('State').value()
     citites = storage.all('City').value()
     amenities = storage.all('Amenity').value
-    return render_template('10-hbnb_filters.html',
-                           states=states, cities=cities, amenities=amenities)
+    return render_template('10-hbnb_filters.html', **locals())
 
 
 @app.teardown_appcontext
